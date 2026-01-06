@@ -93,10 +93,11 @@ ImageToolbox/
 │   ├── AppDelegate.m
 │   ├── ITBMainWindowController.h
 │   ├── ITBMainWindowController.m
+│   ├── ITBDropZoneView.h
+│   ├── ITBDropZoneView.m
 │   ├── ITBImageConverter.h
 │   ├── ITBImageConverter.m
 │   ├── Resources/
-│   │   ├── MainMenu.xib
 │   │   └── Assets.xcassets
 │   └── Supporting Files/
 │       ├── Info.plist
@@ -104,6 +105,8 @@ ImageToolbox/
 └── ImageToolboxTests/
     └── ITBImageConverterTests.m
 ```
+
+**Note:** UI is built programmatically (no XIB/Storyboard) for full control and easier code review.
 
 ---
 
@@ -162,23 +165,55 @@ typedef NS_ENUM(NSInteger, ITBImageFormat) {
 
 ```objc
 #import <Cocoa/Cocoa.h>
+#import "ITBDropZoneView.h"
 
 @interface ITBMainWindowController : NSWindowController
 
-// UI Outlets
-@property (weak) IBOutlet NSView *dropZoneView;
-@property (weak) IBOutlet NSSegmentedControl *formatSelector;
-@property (weak) IBOutlet NSSlider *qualitySlider;
-@property (weak) IBOutlet NSTextField *qualityLabel;
-@property (weak) IBOutlet NSColorWell *backgroundColorWell;
-@property (weak) IBOutlet NSButton *saveButton;
-@property (weak) IBOutlet NSImageView *thumbnailView;
-@property (weak) IBOutlet NSTextField *statusLabel;
+// UI Components (created programmatically)
+@property (strong) ITBDropZoneView *dropZoneView;
+@property (strong) NSSegmentedControl *formatSelector;
+@property (strong) NSSlider *qualitySlider;
+@property (strong) NSTextField *qualityLabel;
+@property (strong) NSColorWell *backgroundColorWell;
+@property (strong) NSButton *saveButton;
+@property (strong) NSImageView *thumbnailView;
+@property (strong) NSTextField *statusLabel;
+
+// State
+@property (strong) NSImage *sourceImage;
+@property (assign) ITBImageFormat selectedFormat;
+@property (assign) NSInteger qualityPercent;
 
 // Actions
-- (IBAction)formatChanged:(id)sender;
-- (IBAction)qualityChanged:(id)sender;
-- (IBAction)saveClicked:(id)sender;
+- (void)formatChanged:(id)sender;
+- (void)qualityChanged:(id)sender;
+- (void)saveClicked:(id)sender;
+
+// Setup
+- (void)setupUI;
+- (void)setupConstraints;
+
+@end
+```
+
+### ITBDropZoneView.h
+
+```objc
+#import <Cocoa/Cocoa.h>
+
+@protocol ITBDropZoneViewDelegate <NSObject>
+- (void)dropZoneView:(ITBDropZoneView *)view didReceiveImageAtURL:(NSURL *)url;
+@end
+
+@interface ITBDropZoneView : NSView <NSDraggingDestination>
+
+@property (weak) id<ITBDropZoneViewDelegate> delegate;
+@property (strong) NSImageView *thumbnailView;
+@property (strong) NSTextField *instructionLabel;
+@property (assign, readonly) BOOL isHighlighted;
+
+- (void)setImage:(NSImage *)image;
+- (void)reset;
 
 @end
 ```
