@@ -61,7 +61,7 @@
 }
 
 - (void)setupInstructionLabel {
-    _instructionLabel = [NSTextField labelWithString:@"Drop Image Here\nPNG, JPEG, or WebP"];
+    _instructionLabel = [NSTextField labelWithString:@"Drop Image Here\nPNG, JPEG, WebP, SVG, or Android VD"];
     _instructionLabel.translatesAutoresizingMaskIntoConstraints = NO;
     _instructionLabel.alignment = NSTextAlignmentCenter;
     _instructionLabel.textColor = [NSColor secondaryLabelColor];
@@ -115,37 +115,38 @@
     }
 }
 
+- (BOOL)isValidFileExtension:(NSString *)extension {
+    NSSet *validExtensions = [NSSet setWithArray:@[@"png", @"jpg", @"jpeg", @"webp", @"svg", @"xml"]];
+    return [validExtensions containsObject:extension.lowercaseString];
+}
+
+- (NSArray<NSURL *> *)imageURLsFromPasteboard:(NSPasteboard *)pasteboard {
+    NSArray *classes = @[[NSURL class]];
+    NSDictionary *options = @{NSPasteboardURLReadingFileURLsOnlyKey: @YES};
+    NSArray *urls = [pasteboard readObjectsForClasses:classes options:options];
+
+    NSMutableArray *validURLs = [NSMutableArray array];
+    for (NSURL *url in urls) {
+        if ([self isValidFileExtension:url.pathExtension]) {
+            [validURLs addObject:url];
+        }
+    }
+    return validURLs;
+}
+
 - (BOOL)isValidDragForInfo:(id<NSDraggingInfo>)sender {
     NSPasteboard *pboard = [sender draggingPasteboard];
 
-    NSArray<NSURL *> *urls = [pboard readObjectsForClasses:@[[NSURL class]]
-                                                   options:@{
-        NSPasteboardURLReadingFileURLsOnlyKey: @YES,
-        NSPasteboardURLReadingContentsConformToTypesKey: @[
-            UTTypePNG,
-            UTTypeJPEG,
-            UTTypeWebP
-        ]
-    }];
+    if (![pboard.types containsObject:NSPasteboardTypeFileURL]) {
+        return NO;
+    }
 
-    // Only accept single file
-    return urls.count == 1;
+    NSArray<NSURL *> *urls = [self imageURLsFromPasteboard:pboard];
+    return urls.count > 0;
 }
 
-- (nullable NSURL *)imageURLFromDraggingInfo:(id<NSDraggingInfo>)sender {
-    NSPasteboard *pboard = [sender draggingPasteboard];
-
-    NSArray<NSURL *> *urls = [pboard readObjectsForClasses:@[[NSURL class]]
-                                                   options:@{
-        NSPasteboardURLReadingFileURLsOnlyKey: @YES,
-        NSPasteboardURLReadingContentsConformToTypesKey: @[
-            UTTypePNG,
-            UTTypeJPEG,
-            UTTypeWebP
-        ]
-    }];
-
-    return urls.firstObject;
+- (NSArray<NSURL *> *)imageURLsFromDraggingInfo:(id<NSDraggingInfo>)sender {
+    return [self imageURLsFromPasteboard:[sender draggingPasteboard]];
 }
 
 #pragma mark - NSDraggingDestination
@@ -174,9 +175,11 @@
 }
 
 - (BOOL)performDragOperation:(id<NSDraggingInfo>)sender {
-    NSURL *url = [self imageURLFromDraggingInfo:sender];
-    if (url && self.delegate) {
-        [self.delegate dropZoneView:self didReceiveImageAtURL:url];
+    NSArray<NSURL *> *urls = [self imageURLsFromDraggingInfo:sender];
+
+    if (urls.count > 0 && self.delegate &&
+        [self.delegate respondsToSelector:@selector(dropZoneView:didReceiveImageURLs:)]) {
+        [self.delegate dropZoneView:self didReceiveImageURLs:urls];
         return YES;
     }
     return NO;

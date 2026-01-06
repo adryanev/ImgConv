@@ -14,6 +14,11 @@
 		1A0000010000000000000005 /* ITBMainWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000020000000000000005 /* ITBMainWindowController.m */; };
 		1A0000010000000000000006 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A0000020000000000000006 /* Assets.xcassets */; };
 		1A0000010000000000000007 /* ITBImageConverterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000020000000000000007 /* ITBImageConverterTests.m */; };
+		1A0000010000000000000010 /* ITBVectorDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000020000000000000010 /* ITBVectorDocument.m */; };
+		1A0000010000000000000011 /* ITBVectorConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000020000000000000011 /* ITBVectorConverter.m */; };
+		1A0000010000000000000012 /* ITBImageTracer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000020000000000000012 /* ITBImageTracer.m */; };
+		1A0000010000000000000020 /* ITBSourceItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000020000000000000020 /* ITBSourceItem.m */; };
+		1A0000010000000000000021 /* ITBThumbnailGridView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000020000000000000021 /* ITBThumbnailGridView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +45,16 @@
 		1A000002000000000000000B /* ITBMainWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ITBMainWindowController.h; sourceTree = "<group>"; };
 		1A000002000000000000000C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1A000002000000000000000D /* ImageToolbox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ImageToolbox.entitlements; sourceTree = "<group>"; };
+		1A000002000000000000000E /* ITBVectorDocument.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ITBVectorDocument.h; sourceTree = "<group>"; };
+		1A0000020000000000000010 /* ITBVectorDocument.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ITBVectorDocument.m; sourceTree = "<group>"; };
+		1A000002000000000000000F /* ITBVectorConverter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ITBVectorConverter.h; sourceTree = "<group>"; };
+		1A0000020000000000000011 /* ITBVectorConverter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ITBVectorConverter.m; sourceTree = "<group>"; };
+		1A0000020000000000000013 /* ITBImageTracer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ITBImageTracer.h; sourceTree = "<group>"; };
+		1A0000020000000000000012 /* ITBImageTracer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ITBImageTracer.m; sourceTree = "<group>"; };
+		1A000002000000000000001E /* ITBSourceItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ITBSourceItem.h; sourceTree = "<group>"; };
+		1A0000020000000000000020 /* ITBSourceItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ITBSourceItem.m; sourceTree = "<group>"; };
+		1A000002000000000000001F /* ITBThumbnailGridView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ITBThumbnailGridView.h; sourceTree = "<group>"; };
+		1A0000020000000000000021 /* ITBThumbnailGridView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ITBThumbnailGridView.m; sourceTree = "<group>"; };
 		1A0000060000000000000001 /* ImageToolbox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImageToolbox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A0000060000000000000002 /* ImageToolboxTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ImageToolboxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -93,6 +108,16 @@
 				1A0000020000000000000004 /* ITBDropZoneView.m */,
 				1A000002000000000000000B /* ITBMainWindowController.h */,
 				1A0000020000000000000005 /* ITBMainWindowController.m */,
+				1A000002000000000000000E /* ITBVectorDocument.h */,
+				1A0000020000000000000010 /* ITBVectorDocument.m */,
+				1A000002000000000000000F /* ITBVectorConverter.h */,
+				1A0000020000000000000011 /* ITBVectorConverter.m */,
+				1A0000020000000000000013 /* ITBImageTracer.h */,
+				1A0000020000000000000012 /* ITBImageTracer.m */,
+				1A000002000000000000001E /* ITBSourceItem.h */,
+				1A0000020000000000000020 /* ITBSourceItem.m */,
+				1A000002000000000000001F /* ITBThumbnailGridView.h */,
+				1A0000020000000000000021 /* ITBThumbnailGridView.m */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -242,6 +267,11 @@
 				1A0000010000000000000003 /* ITBImageConverter.m in Sources */,
 				1A0000010000000000000004 /* ITBDropZoneView.m in Sources */,
 				1A0000010000000000000005 /* ITBMainWindowController.m in Sources */,
+				1A0000010000000000000010 /* ITBVectorDocument.m in Sources */,
+				1A0000010000000000000011 /* ITBVectorConverter.m in Sources */,
+				1A0000010000000000000012 /* ITBImageTracer.m in Sources */,
+				1A0000010000000000000020 /* ITBSourceItem.m in Sources */,
+				1A0000010000000000000021 /* ITBThumbnailGridView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

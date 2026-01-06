@@ -1,4 +1,5 @@
 #import "ITBImageConverter.h"
+#import <os/log.h>
 
 NSErrorDomain const ITBImageConverterErrorDomain = @"ITBImageConverterErrorDomain";
 
@@ -14,6 +15,7 @@ NSErrorDomain const ITBImageConverterErrorDomain = @"ITBImageConverterErrorDomai
 
     // Validate input
     if (!image) {
+        os_log_error(OS_LOG_DEFAULT, "Image conversion failed: No image provided");
         if (error) {
             *error = [NSError errorWithDomain:ITBImageConverterErrorDomain
                                          code:ITBImageConverterErrorInvalidInput
@@ -31,6 +33,7 @@ NSErrorDomain const ITBImageConverterErrorDomain = @"ITBImageConverterErrorDomai
     // Get CGImage from NSImage
     CGImageRef cgImage = [self cgImageFromNSImage:image withBackgroundColor:backgroundColor];
     if (!cgImage) {
+        os_log_error(OS_LOG_DEFAULT, "Image conversion failed: Failed to decode image to CGImage");
         if (error) {
             *error = [NSError errorWithDomain:ITBImageConverterErrorDomain
                                          code:ITBImageConverterErrorDecodingFailed
@@ -45,6 +48,7 @@ NSErrorDomain const ITBImageConverterErrorDomain = @"ITBImageConverterErrorDomai
     // Get UTType for target format
     UTType *utType = [ITBImageConverter utTypeForFormat:format];
     if (!utType) {
+        os_log_error(OS_LOG_DEFAULT, "Image conversion failed: Unsupported output format %d", (int)format);
         CGImageRelease(cgImage);
         if (error) {
             *error = [NSError errorWithDomain:ITBImageConverterErrorDomain
@@ -67,6 +71,8 @@ NSErrorDomain const ITBImageConverterErrorDomain = @"ITBImageConverterErrorDomai
     );
 
     if (!destination) {
+        os_log_error(OS_LOG_DEFAULT, "Image conversion failed: Failed to create image encoder for format %{public}@",
+                     utType.identifier);
         CGImageRelease(cgImage);
         if (error) {
             *error = [NSError errorWithDomain:ITBImageConverterErrorDomain
@@ -89,6 +95,7 @@ NSErrorDomain const ITBImageConverterErrorDomain = @"ITBImageConverterErrorDomai
     CGImageRelease(cgImage);
 
     if (!success) {
+        os_log_error(OS_LOG_DEFAULT, "Image conversion failed: Failed to finalize image encoding");
         if (error) {
             *error = [NSError errorWithDomain:ITBImageConverterErrorDomain
                                          code:ITBImageConverterErrorEncodingFailed

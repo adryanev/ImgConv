@@ -7,10 +7,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// Delegate protocol for ITBDropZoneView
 @protocol ITBDropZoneViewDelegate <NSObject>
 
-/// Called when an image file is dropped onto the view
+@optional
+
+/// Called when one or more image files are dropped onto the view
 /// @param view The drop zone view
-/// @param url URL of the dropped image file
-- (void)dropZoneView:(ITBDropZoneView *)view didReceiveImageAtURL:(NSURL *)url;
+/// @param urls Array of URLs of the dropped image files
+- (void)dropZoneView:(ITBDropZoneView *)view didReceiveImageURLs:(NSArray<NSURL *> *)urls;
 
 @end
 

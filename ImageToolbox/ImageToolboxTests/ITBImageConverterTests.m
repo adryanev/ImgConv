@@ -22,23 +22,24 @@
 #pragma mark - Helper Methods
 
 - (NSImage *)createTestImageWithSize:(NSSize)size hasAlpha:(BOOL)hasAlpha {
-    NSImage *image = [[NSImage alloc] initWithSize:size];
-    [image lockFocus];
-
-    if (hasAlpha) {
-        // Draw with transparency
-        [[NSColor clearColor] setFill];
-        NSRectFill(NSMakeRect(0, 0, size.width, size.height));
-        [[NSColor redColor] setFill];
-        NSBezierPath *path = [NSBezierPath bezierPathWithOvalInRect:NSInsetRect(NSMakeRect(0, 0, size.width, size.height), 10, 10)];
-        [path fill];
-    } else {
-        // Solid color, no alpha
-        [[NSColor blueColor] setFill];
-        NSRectFill(NSMakeRect(0, 0, size.width, size.height));
-    }
-
-    [image unlockFocus];
+    // Use modern block-based API (thread-safe, not deprecated)
+    NSImage *image = [NSImage imageWithSize:size
+                                    flipped:NO
+                             drawingHandler:^BOOL(NSRect dstRect) {
+        if (hasAlpha) {
+            // Draw with transparency
+            [[NSColor clearColor] setFill];
+            NSRectFill(NSMakeRect(0, 0, size.width, size.height));
+            [[NSColor redColor] setFill];
+            NSBezierPath *path = [NSBezierPath bezierPathWithOvalInRect:NSInsetRect(NSMakeRect(0, 0, size.width, size.height), 10, 10)];
+            [path fill];
+        } else {
+            // Solid color, no alpha
+            [[NSColor blueColor] setFill];
+            NSRectFill(NSMakeRect(0, 0, size.width, size.height));
+        }
+        return YES;
+    }];
     return image;
 }
 
