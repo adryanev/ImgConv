@@ -74,6 +74,16 @@
 		1A0000080000000000000002 /* ImageToolbox */ = {
 			isa = PBXGroup;
 			children = (
+				1A0000080000000000000008 /* Sources */,
+				1A0000080000000000000005 /* Resources */,
+				1A0000080000000000000006 /* Supporting Files */,
+			);
+			path = ImageToolbox;
+			sourceTree = "<group>";
+		};
+		1A0000080000000000000008 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
 				1A0000020000000000000001 /* main.m */,
 				1A0000020000000000000008 /* AppDelegate.h */,
 				1A0000020000000000000002 /* AppDelegate.m */,
@@ -83,10 +93,8 @@
 				1A0000020000000000000004 /* ITBDropZoneView.m */,
 				1A000002000000000000000B /* ITBMainWindowController.h */,
 				1A0000020000000000000005 /* ITBMainWindowController.m */,
-				1A0000080000000000000005 /* Resources */,
-				1A0000080000000000000006 /* Supporting Files */,
 			);
-			path = ImageToolbox;
+			path = Sources;
 			sourceTree = "<group>";
 		};
 		1A0000080000000000000003 /* ImageToolboxTests */ = {
