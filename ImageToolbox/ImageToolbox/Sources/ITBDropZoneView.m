@@ -37,7 +37,7 @@
 
     [self setupThumbnailView];
     [self setupInstructionLabel];
-    [self registerForDraggedTypes];
+    [self setupDragTypes];
 
     _isHighlighted = NO;
 }
@@ -76,7 +76,7 @@
     ]];
 }
 
-- (void)registerForDraggedTypes {
+- (void)setupDragTypes {
     [self registerForDraggedTypes:@[NSPasteboardTypeFileURL]];
 }
 
