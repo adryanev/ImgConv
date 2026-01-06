@@ -162,12 +162,23 @@ static const unsigned long long kMaxFileSizeBytes = 100 * 1024 * 1024; // 100MB
 
 - (void)generateThumbnailWithSize:(CGSize)size
                        completion:(void (^)(NSImage * _Nullable))completion {
+    __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self generateThumbnailWithSize:size];
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            if (completion) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completion(nil);
+                });
+            }
+            return;
+        }
+
+        [strongSelf generateThumbnailWithSize:size];
 
         dispatch_async(dispatch_get_main_queue(), ^{
             if (completion) {
-                completion(self.thumbnail);
+                completion(strongSelf.thumbnail);
             }
         });
     });

@@ -436,9 +436,12 @@ static const CGFloat kSpacing = 12.0;
     NSString *extension = [self fileExtensionForOutputFormat:self.selectedOutputFormat];
     panel.nameFieldStringValue = [NSString stringWithFormat:@"%@.%@", baseName, extension];
 
+    __weak typeof(self) weakSelf = self;
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse result) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return;
         if (result == NSModalResponseOK && panel.URL) {
-            [self exportItem:item toURL:panel.URL];
+            [strongSelf exportItem:item toURL:panel.URL];
         }
     }];
 }
@@ -451,9 +454,12 @@ static const CGFloat kSpacing = 12.0;
     panel.prompt = @"Choose Output Folder";
     panel.message = [NSString stringWithFormat:@"Export %lu files to folder", (unsigned long)self.sourceItems.count];
 
+    __weak typeof(self) weakSelf = self;
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse result) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return;
         if (result == NSModalResponseOK && panel.URL) {
-            [self batchExportToFolder:panel.URL];
+            [strongSelf batchExportToFolder:panel.URL];
         }
     }];
 }
@@ -511,24 +517,31 @@ static const CGFloat kSpacing = 12.0;
     self.statusLabel.stringValue = @"Converting...";
     self.saveButton.enabled = NO;
 
+    __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return;
+
         NSError *error = nil;
-        NSData *data = [self convertItem:item error:&error];
+        NSData *data = [strongSelf convertItem:item error:&error];
 
         dispatch_async(dispatch_get_main_queue(), ^{
+            __strong typeof(weakSelf) innerSelf = weakSelf;
+            if (!innerSelf) return;
+
             if (data) {
                 NSError *writeError = nil;
                 BOOL success = [data writeToURL:url options:NSDataWritingAtomic error:&writeError];
 
                 if (success) {
-                    self.statusLabel.stringValue = [NSString stringWithFormat:@"Saved: %@", url.lastPathComponent];
+                    innerSelf.statusLabel.stringValue = [NSString stringWithFormat:@"Saved: %@", url.lastPathComponent];
                 } else {
-                    [self showError:writeError ?: error];
+                    [innerSelf showError:writeError ?: error];
                 }
             } else {
-                [self showError:error];
+                [innerSelf showError:error];
             }
-            self.saveButton.enabled = YES;
+            innerSelf.saveButton.enabled = YES;
         });
     });
 }
@@ -557,18 +570,27 @@ static const CGFloat kSpacing = 12.0;
     // Use concurrent queue for parallel processing
     dispatch_queue_t processingQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 
+    // Weak reference to self to avoid retain cycles in blocks
+    __weak typeof(self) weakSelf = self;
+
     // Process all items concurrently
     for (NSUInteger i = 0; i < items.count; i++) {
         ITBSourceItem *item = items[i];
 
         dispatch_group_enter(group);
         dispatch_async(processingQueue, ^{
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            if (!strongSelf) {
+                dispatch_group_leave(group);
+                return;
+            }
+
             NSError *error = nil;
-            NSData *data = [self convertItem:item error:&error];
+            NSData *data = [strongSelf convertItem:item error:&error];
 
             BOOL itemSuccess = NO;
             if (data) {
-                NSString *sanitizedName = [self sanitizedFilename:item.filename];
+                NSString *sanitizedName = [strongSelf sanitizedFilename:item.filename];
                 NSString *baseName = sanitizedName.stringByDeletingPathExtension;
                 NSString *outputName = [NSString stringWithFormat:@"%@.%@", baseName, extension];
                 NSURL *outputURL = [folderURL URLByAppendingPathComponent:outputName];
@@ -598,9 +620,11 @@ static const CGFloat kSpacing = 12.0;
 
             // Update progress on main thread (non-blocking)
             dispatch_async(dispatch_get_main_queue(), ^{
-                self.batchProgressLabel.stringValue = [NSString stringWithFormat:@"Processed %lld/%lu",
+                __strong typeof(weakSelf) innerSelf = weakSelf;
+                if (!innerSelf) return;
+                innerSelf.batchProgressLabel.stringValue = [NSString stringWithFormat:@"Processed %lld/%lu",
                                                        newCompleted, (unsigned long)totalCount];
-                self.batchProgressIndicator.doubleValue = ((double)newCompleted / totalCount) * 100;
+                innerSelf.batchProgressIndicator.doubleValue = ((double)newCompleted / totalCount) * 100;
             });
 
             dispatch_group_leave(group);
@@ -610,10 +634,13 @@ static const CGFloat kSpacing = 12.0;
     // Non-blocking completion handler using dispatch_group_notify
     // This runs on main queue when all items are processed, without blocking UI
     dispatch_group_notify(group, dispatch_get_main_queue(), ^{
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return;
+
         // Hide progress indicators
-        self.batchProgressIndicator.hidden = YES;
-        self.batchProgressLabel.hidden = YES;
-        self.saveButton.enabled = YES;
+        strongSelf.batchProgressIndicator.hidden = YES;
+        strongSelf.batchProgressLabel.hidden = YES;
+        strongSelf.saveButton.enabled = YES;
 
         // Show completion alert
         NSAlert *alert = [[NSAlert alloc] init];
@@ -627,17 +654,17 @@ static const CGFloat kSpacing = 12.0;
             alert.messageText = @"Batch Export Complete";
             alert.informativeText = [NSString stringWithFormat:@"Successfully exported %lld files.",
                                      finalSuccessCount];
-            self.statusLabel.stringValue = [NSString stringWithFormat:@"Exported %lld files successfully",
+            strongSelf.statusLabel.stringValue = [NSString stringWithFormat:@"Exported %lld files successfully",
                                             finalSuccessCount];
         } else {
             alert.messageText = @"Batch Export Completed with Errors";
             alert.informativeText = [NSString stringWithFormat:@"Exported %lld/%lu files. %lld files failed.",
                                      finalSuccessCount, (unsigned long)totalCount, finalFailCount];
-            self.statusLabel.stringValue = [NSString stringWithFormat:@"Exported %lld/%lu (failed: %lld)",
+            strongSelf.statusLabel.stringValue = [NSString stringWithFormat:@"Exported %lld/%lu (failed: %lld)",
                                             finalSuccessCount, (unsigned long)totalCount, finalFailCount];
         }
 
-        [alert beginSheetModalForWindow:self.window completionHandler:nil];
+        [alert beginSheetModalForWindow:strongSelf.window completionHandler:nil];
     });
 }
 
@@ -876,9 +903,12 @@ static const CGFloat kSpacing = 12.0;
     panel.allowedContentTypes = @[UTTypePNG, UTTypeJPEG, UTTypeWebP, UTTypeXML];
     panel.message = @"Select images to add";
 
+    __weak typeof(self) weakSelf = self;
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse result) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return;
         if (result == NSModalResponseOK) {
-            [self addItemsFromURLs:panel.URLs];
+            [strongSelf addItemsFromURLs:panel.URLs];
         }
     }];
 }
